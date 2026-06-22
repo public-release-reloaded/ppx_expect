@@ -368,7 +368,8 @@ let let_expect_pat =
                      (Attribute.pattern Ppx_inline_test.tags opt_name)
                      ~f:(fun f attributes ->
                        f ~tags:(Option.value ~default:[] attributes)))
-                ~expr:__))
+                ~expr:__
+                ~constraint_:drop))
         ^:: nil)
      ^:: nil)
 ;;
