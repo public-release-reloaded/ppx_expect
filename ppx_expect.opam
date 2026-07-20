@@ -12,15 +12,15 @@ build: [
 ]
 depends: [
   "ocaml" {>= "5.5.0"}
-  "base"
-  "capsule"
-  "portable"
-  "ppx_fuelproof"
-  "ppx_here"
-  "ppx_inline_test"
-  "stdio"
-  "dune"            {>= "3.17.0"}
-  "ppxlib"          {>= "0.38.0"}
+  "base" {>= "v0.18~" & < "v0.19~"}
+  "capsule" {>= "v0.18~" & < "v0.19~"}
+  "portable" {>= "v0.18~" & < "v0.19~"}
+  "ppx_fuelproof" {>= "v0.18~" & < "v0.19~"}
+  "ppx_here" {>= "v0.18~" & < "v0.19~"}
+  "ppx_inline_test" {>= "v0.18~" & < "v0.19~"}
+  "stdio" {>= "v0.18~" & < "v0.19~"}
+  "dune" {>= "3.17.0"}
+  "ppxlib" {>= "0.38.0"}
 ]
 available: arch != "x86_32"
 synopsis: "Cram like framework for OCaml"
