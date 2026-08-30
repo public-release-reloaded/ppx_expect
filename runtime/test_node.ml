@@ -302,6 +302,7 @@ module Global_results_table = struct
   type file =
     { expectations : node Hashtbl.M(Expectation_id).t
     ; postprocess : postprocess
+    ; filename_rel_to_project_root : string
     }
 
   let global_results_table : file Hashtbl.M(String).t = Hashtbl.create (module String)
@@ -318,13 +319,22 @@ module Global_results_table = struct
                  (Expectation_id.to_int_exn test_id)))
   ;;
 
-  let initialize_and_register_tests ~absolute_filename tests postprocess =
+  let initialize_and_register_tests
+    ~absolute_filename
+    ~filename_rel_to_project_root
+    tests
+    postprocess
+    =
     let tests_as_in_table = Queue.create () in
     Hashtbl.update global_results_table absolute_filename ~f:(fun file ->
       let file =
         Option.value
           file
-          ~default:{ expectations = Hashtbl.create (module Expectation_id); postprocess }
+          ~default:
+            { expectations = Hashtbl.create (module Expectation_id)
+            ; postprocess
+            ; filename_rel_to_project_root
+            }
       in
       let tests = Hashtbl.of_alist_exn (module Expectation_id) tests in
       Hashtbl.merge_into
@@ -343,9 +353,10 @@ module Global_results_table = struct
     global_results_table
     |> Hashtbl.to_alist
     |> List.sort ~compare:(Comparable.lift ~f:fst String.compare)
-    |> List.map ~f:(fun (filename, { expectations; postprocess }) ->
-      let test_nodes = Hashtbl.data expectations in
-      f ~filename ~test_nodes ~postprocess)
+    |> List.map
+         ~f:(fun (filename, { expectations; postprocess; filename_rel_to_project_root }) ->
+           let test_nodes = Hashtbl.data expectations in
+           f ~filename ~filename_rel_to_project_root ~test_nodes ~postprocess)
   ;;
 end
 
@@ -411,7 +422,8 @@ end
 
 module For_quick_test = struct
   let file_has_expect_test_failures ~filename_absolute:this_file =
-    Global_results_table.process_each_file ~f:(fun ~filename ~test_nodes ~postprocess:_ ->
+    Global_results_table.process_each_file
+      ~f:(fun ~filename ~filename_rel_to_project_root:_ ~test_nodes ~postprocess:_ ->
       String.equal filename this_file
       && List.exists test_nodes ~f:(fun t ->
         to_correction

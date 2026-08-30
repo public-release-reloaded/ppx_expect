@@ -630,6 +630,7 @@ module Make (C : Expect_test_config_types.S) = struct
         let expectations =
           Test_node.Global_results_table.initialize_and_register_tests
             ~absolute_filename
+            ~filename_rel_to_project_root
             expectations
             (fun ~original_file_contents ts ->
                List.concat_map

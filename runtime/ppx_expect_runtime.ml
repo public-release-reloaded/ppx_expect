@@ -7,12 +7,17 @@ let () =
   Ppx_inline_test_lib.add_evaluator ~f:(fun () ->
     Stdlib.Sys.chdir (force Current_file.initial_dir);
     Test_node.Global_results_table.process_each_file
-      ~f:(fun ~filename ~test_nodes ~postprocess ->
+      ~f:(fun ~filename ~filename_rel_to_project_root ~test_nodes ~postprocess ->
         let filename =
           match Ppx_inline_test_lib.source_tree_root () with
           | None -> filename
           | Some source_tree_root ->
-            Stdlib.Filename.concat source_tree_root (Stdlib.Filename.basename filename)
+            (* [filename] is keyed on the file's basename resolved against the
+               runner's cwd (the library's build dir), so it drops the library's
+               subdirectory.  When a source-tree root is given, rebuild the path
+               from the full project-root-relative filename instead, so libraries
+               that are not at the workspace root find their source file. *)
+            Stdlib.Filename.concat source_tree_root filename_rel_to_project_root
         in
         Write_corrected_file.f
           test_nodes

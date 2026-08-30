@@ -102,6 +102,7 @@ module Global_results_table : sig
          [Test_node.t] that was already in the table *)
   val initialize_and_register_tests
     :  absolute_filename:string
+    -> filename_rel_to_project_root:string
     -> (Expectation_id.t, node) List.Assoc.t
     -> postprocess
     -> (Expectation_id.t, node) List.Assoc.t
@@ -109,7 +110,12 @@ module Global_results_table : sig
   val find_test : absolute_filename:string -> test_id:Expectation_id.t -> node
 
   val process_each_file
-    :  f:(filename:string -> test_nodes:node list -> postprocess:postprocess -> 'a)
+    :  f:
+         (filename:string
+          -> filename_rel_to_project_root:string
+          -> test_nodes:node list
+          -> postprocess:postprocess
+          -> 'a)
     -> 'a list
 end
 
